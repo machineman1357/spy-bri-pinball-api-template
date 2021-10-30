@@ -1,0 +1,26 @@
+.statsBar_container {
+	position: absolute;
+	left: 50%;
+	bottom: 0;
+	transform: translate(-50%, 0);
+	width: 200px;
+	height: 38px;
+	background-color: black;
+
+    color: white;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    font-size: 33px;
+	padding: 0 10px;
+}
+
+.statsBar_multiplier {
+	padding-right: 50px;
+}
+
+.statsBar_score {
+	width: 200px;
+	display: flex;
+    justify-content: flex-end;
+}

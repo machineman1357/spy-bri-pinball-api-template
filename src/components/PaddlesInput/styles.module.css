@@ -1,0 +1,66 @@
+.paddlesInput_container {
+	position: absolute;
+	left: 50%;
+	bottom: 0;
+	color: white;
+	transform: translate(-50%, 0);
+	display: flex;
+	width: 780px;
+	justify-content: space-between;
+	font-size: 24px;
+	user-select: none;
+	pointer-events: none;
+}
+
+.paddlesInput_button_container {
+	width: 100px;
+	height: 100px;
+	position: relative;
+}
+
+.paddlesInput_button {
+	width: 100%;
+	height: 100%;
+	background-color: #d60d0d;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 50%;
+	pointer-events: all;
+	flex-direction: column;
+	position: absolute;
+	top: -6px;
+	box-shadow: 0px 6px #868686;
+}
+
+.paddlesInput_button:hover {
+	cursor: pointer;
+	background-color: #d14747;
+}
+
+.paddlesInput_button_active {
+	top: 0px;
+	box-shadow: 0px 0px #868686;
+}
+
+.keyboardKeys_container {
+	display: flex;
+}
+
+.keyboardKey_container {
+	width: 18px;
+	height: 18px;
+	border: 2px solid white;
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 18px;
+	border-radius: 5px;
+	line-height: 0;
+	padding: 8px;
+}
+
+.keyboardKey_container:first-child {
+	margin-right: 1px;
+}

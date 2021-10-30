@@ -1,0 +1,3 @@
+Scenes
+	- make sure to add a scene config and pass into class' super
+	- make sure to reference a scene's config's name when changing scenes
