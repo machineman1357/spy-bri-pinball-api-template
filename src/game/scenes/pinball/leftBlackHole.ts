@@ -1,6 +1,6 @@
 import { LBH_BLOCKER } from "game/assets";
-import { config } from "game/unOrganized/config";
-import { set_isLeftBlackHoleOpen } from "game/unOrganized/stats";
+import { modifyMultiplier, set_isLeftBlackHoleOpen } from "game/unOrganized/stats";
+import { topLeftHole } from "helpers/vars";
 import { ball, pinballScene } from "./pinball-scene";
 
 const blocker_position = {
@@ -11,7 +11,14 @@ let blocker_go: any;
 let isHoleOpen = false;
 let blocker_spirte: any;
 let canEnterHole = true;
-export const LBH_timeOuts: any = [];
+let isMultiplierActive = false;
+export let timer_closeLBH: Phaser.Time.TimerEvent;
+
+export function reset() {
+    isHoleOpen = false;
+    canEnterHole = true;
+    isMultiplierActive = false;
+}
 
 function create_blocker_sprite() {
 	blocker_spirte = pinballScene.add.image(60.69442314152116, 171.8378773200348, LBH_BLOCKER);
@@ -27,18 +34,25 @@ function closeHole() {
 	isHoleOpen = false;
 	blocker_go.setPosition(blocker_position.x, blocker_position.y);
 	blocker_spirte.visible = true;
+
+    if(isMultiplierActive) {
+        console.log("LBH multiplier is active, modifyMultiplier(-4)");
+        modifyMultiplier(-4);
+        isMultiplierActive = false;
+    }
 }
 
 export function on_sideBumperHit() {
+    console.log("on_sideBumperHit(), isHoleOpen:", isHoleOpen);
 	if(!isHoleOpen) {
 		isHoleOpen = true;
 		openHole();
 
-		const timeOut_closeHole = setTimeout(() => {
-			closeHole();
-		}, config.topLeftHole.staysOpenFor_ms);
-
-		LBH_timeOuts.push(timeOut_closeHole);
+		timer_closeLBH = pinballScene.time.addEvent({
+			delay: topLeftHole.staysOpenFor_ms,
+			callback: closeHole,
+			args: []
+		});
 	}
 }
 
@@ -58,20 +72,31 @@ function create_blocker_collider() {
 
 function ballExitHole() {
 	ball.setStatic(false);
-	ball.setVelocity(0, config.topLeftHole.exitHoleVelocityY);
+	ball.setVelocity(0, topLeftHole.exitHoleVelocityY);
 	ball.alpha = 1;
+    if(!isMultiplierActive) {
+        console.log("LBH multiplier is NOT active, modifyMultiplier(4)");
+        isMultiplierActive = true;
+        modifyMultiplier(4);
+    }
 
-	const timeOut_canEnterHole = setTimeout(() => {
-		canEnterHole = true;
-	}, config.topLeftHole.timeBeforeBallCanEnterHoleAgain_ms);
+    timer_closeLBH.paused = false;
 
-	set_isLeftBlackHoleOpen(true);
-	const timeOut_isLBHOpen = setTimeout(() => {
-		set_isLeftBlackHoleOpen(false);
-	}, config.topLeftHole.doublePointsLastFor_ms);
+	pinballScene.time.addEvent({
+		delay: topLeftHole.timeBeforeBallCanEnterHoleAgain_ms,
+		callback: () => {
+			canEnterHole = true;
+		},
+		args: []
+	});
 
-	LBH_timeOuts.push(timeOut_canEnterHole);
-	LBH_timeOuts.push(timeOut_isLBHOpen);
+	pinballScene.time.addEvent({
+		delay: topLeftHole.doublePointsLastFor_ms,
+		callback: () => {
+			set_isLeftBlackHoleOpen(false);
+		},
+		args: []
+	});
 }
 
 function ballEnterHole() {
@@ -81,14 +106,20 @@ function ballEnterHole() {
 	ball.setVelocity(0, 0);
 	ball.alpha = 0;
 
-	const timeOut_ballExitHole = setTimeout(() => {
-		ballExitHole();
-	}, config.topLeftHole.timeInHole_ms);
+    timer_closeLBH.paused = true;
+    timer_closeLBH.elapsed -= 1000;
 
-	LBH_timeOuts.push(timeOut_ballExitHole);
+	pinballScene.time.addEvent({
+		delay: topLeftHole.timeInHole_ms,
+		callback: () => {
+			ballExitHole();
+		},
+		args: []
+	});
 }
 
 export function on_ballEnteredHole() {
+    console.log("ball touched LFB, canEnterHole?", canEnterHole);
 	if(canEnterHole) {
 		ballEnterHole();
 	}

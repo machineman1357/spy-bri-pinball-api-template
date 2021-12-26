@@ -46,6 +46,24 @@ export const PLINKO_TUBES_AND_GRID_BG = 'plinko_tubesAndGridBG';
 export const GHST = 'ghst';
 export const SPIN_COIN_2 = 'spin_coin_2';
 export const FIRE = 'fire';
+export const BG_MUSIC = 'bgMusic';
+export const K_POINTS_RED_PLINKO = '1000 pts red plinko';
+export const MARIO_PIPE_SOUND = 'Mario Pipe Sounds';
+export const SLINGSHOT_SOUND = 'Slingshot Sound';
+export const BALL_CURVING_AROUND_AFTER_RELEASE = 'Ball curving around after release';
+export const BALL_HITTING_PLAIN_WALL = 'ball hitting plain wall';
+export const DOUBLE_POINTS_SOUND = 'double points sound';
+export const ETH_COIN = 'eth coin';
+export const GHST_COIN = 'GHST coin';
+export const PLINKO_OST = 'PLINKO OST';
+export const TRIPLE_MULTIPLIER = 'triple multiplier';
+export const WALL_BUMPERS = 'wall bumpers';
+export const PORTAL_SOUND = 'portal sound';
+export const LOOP_RE_ENTRY_BLOCKER = 'LOOP_RE_ENTRY_BLOCKER';
+export const DIAMOND = 'DIAMOND';
+export const PLINKO_LOSE_BALL_SOUND = 'PLINKO_LOSE_BALL_SOUND';
+export const GAME_END_SOUND = 'GAME_END_SOUND';
+export const TILT_SOUND = 'TILT_SOUND';
 
 // Save all in game assets in the public folder
 export const assets: Array<Asset | SpritesheetAsset> = [
@@ -202,5 +220,95 @@ export const assets: Array<Asset | SpritesheetAsset> = [
 		key: FIRE,
 		src: 'assets/images/Frame_13.png',
 		type: 'IMAGE',
+	},
+	{
+		key: BG_MUSIC,
+		src: 'assets/sounds/Pinball soundtrack.mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: K_POINTS_RED_PLINKO,
+		src: 'assets/sounds/1000 pts red plinko.mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: MARIO_PIPE_SOUND,
+		src: 'assets/sounds/Mario Pipe Sounds.mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: SLINGSHOT_SOUND,
+		src: 'assets/sounds/Slingshot sound 2.mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: BALL_CURVING_AROUND_AFTER_RELEASE,
+		src: 'assets/sounds/Ball curving around after release.mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: BALL_HITTING_PLAIN_WALL,
+		src: 'assets/sounds/Ball hitting plain wall.mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: DOUBLE_POINTS_SOUND,
+		src: 'assets/sounds/Double Points Sound.mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: ETH_COIN,
+		src: 'assets/sounds/ETH coin.mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: GHST_COIN,
+		src: 'assets/sounds/GHST coin.mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: PLINKO_OST,
+		src: 'assets/sounds/PLINKO OST.mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: TRIPLE_MULTIPLIER,
+		src: 'assets/sounds/Triple Ring Sound (Above triple ghst coin).mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: WALL_BUMPERS,
+		src: 'assets/sounds/Wall Bumpers (opens up double pts area).mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: PORTAL_SOUND,
+		src: 'assets/sounds/portal sound.mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: LOOP_RE_ENTRY_BLOCKER,
+		src: 'assets/images/loopReEntryBlocker.png',
+		type: 'IMAGE',
+	},
+	{
+		key: DIAMOND,
+		src: 'assets/images/diamond.png',
+		type: 'IMAGE',
+	},
+	{
+		key: PLINKO_LOSE_BALL_SOUND,
+		src: 'assets/sounds/Losing Ball Sound.mp3',
+		type: 'AUDIO',
+	},
+	{
+		key: GAME_END_SOUND,
+		src: 'assets/sounds/GAME ending.mp3',
+		type: 'AUDIO',
+	},
+    {
+		key: TILT_SOUND,
+		src: 'assets/sounds/Tilt sfx.mp3',
+		type: 'AUDIO',
 	},
 ];

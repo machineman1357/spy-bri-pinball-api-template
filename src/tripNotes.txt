@@ -1,3 +1,9 @@
 Scenes
 	- make sure to add a scene config and pass into class' super
 	- make sure to reference a scene's config's name when changing scenes
+	- make sure to add any new scenes AFTER the boot scene import in scenes' folder's index.ts file, because Phaser is imported from it.
+	- scene.start = stops the current one and starts the next one
+	- scene.launch = run the target scene in parallel with current scene
+
+Connecting to game
+    - make sure you are one "Matic Mainnet", not "Matic Quicknode" for example or "Ethereum Mainnet"

@@ -1,0 +1,70 @@
+.gameOver_container {
+    width: 400px;
+    height: 200px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+	user-select: none;
+}
+
+.gameOver_borderContainer {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.gameOver_border_red {
+	width: 107%;
+	height: 114%;
+	position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+	background-color: red;
+}
+
+.gameOver_border_orange {
+	width: 105%;
+	height: 110%;
+	position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+	background-color: orange;
+}
+
+.gameOver_border_yellow {
+	width: 103%;
+	height: 106%;
+	position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+	background-color: yellow;
+}
+
+.gameOver_background {
+	width: 100%;
+	height: 100%;
+	background-color: #d60dbf;
+	position: absolute;
+    left: 0;
+    top: 0;
+	display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 66px;
+	text-align: center;
+	flex-direction: column;
+}
+
+.gameOver_retryContainer {
+	display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}

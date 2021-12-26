@@ -1,4 +1,5 @@
 import { game_ref } from "game/scenes";
+import { setNewStatsBarContainerSize } from "game/unOrganized/statsBar";
 import React, { Component } from "react";
 import styles from "./styles.module.css";
 
@@ -82,6 +83,7 @@ class SinkButton extends Component<ISinkButton> {
 
 export class PaddlesInput_Container extends React.Component<any, IPaddlesInput_Container> {
 	private paddlesInput_container_ref: any;
+    private interval_setNewPaddlesInputContainerSize: any;
 
 	constructor(props: any) {
 		super(props);
@@ -104,14 +106,26 @@ export class PaddlesInput_Container extends React.Component<any, IPaddlesInput_C
 		this.setEvents();
 
 		// set paddles container size for the first time (check every 100ms because game_ref could be null)
-		setInterval(() => {
+		this.interval_setNewPaddlesInputContainerSize = setInterval(() => {
 			this.setNewPaddlesInputContainerSize();
 		}, 100);
 	}
 
+    componentWillUnmount() {
+        console.log("componentWillUnmount", this);
+
+        window.clearInterval(this.interval_setNewPaddlesInputContainerSize);
+    }
+
 	disable_paddlesInput() {
 		this.setState({
 			hidden: true
+		})
+	}
+
+    enable_paddlesInput() {
+		this.setState({
+			hidden: false
 		})
 	}
 
@@ -120,15 +134,11 @@ export class PaddlesInput_Container extends React.Component<any, IPaddlesInput_C
 			// left
 			if(paddleKeyCodeInputs_left.includes(ev.code)) {
 				this.setSinkButtonState(ESinkButtonSide.LEFT, true);
-
-				isInputDown_leftPaddle = true;
 			}
 	
 			// right
 			if(paddleKeyCodeInputs_right.includes(ev.code)) {
 				this.setSinkButtonState(ESinkButtonSide.RIGHT, true);
-
-				isInputDown_rightPaddle = true;
 			}
 		});
 	
@@ -137,21 +147,17 @@ export class PaddlesInput_Container extends React.Component<any, IPaddlesInput_C
 			// left
 			if(paddleKeyCodeInputs_left.includes(ev.code)) {
 				this.setSinkButtonState(ESinkButtonSide.LEFT, false);
-
-				isInputDown_leftPaddle = false;
 			}
 			
 			// right
 			if(paddleKeyCodeInputs_right.includes(ev.code)) {
 				this.setSinkButtonState(ESinkButtonSide.RIGHT, false);
-
-				isInputDown_rightPaddle = false;
 			}
 		});
 
 		window.onresize = () => {
 			this.setNewPaddlesInputContainerSize();
-			// setNewStatsBarContainerSize();
+			setNewStatsBarContainerSize();
 			// setCanvasSize();
 		}
 	}
@@ -177,8 +183,12 @@ export class PaddlesInput_Container extends React.Component<any, IPaddlesInput_C
 	setSinkButtonState(sinkButtonSide: ESinkButtonSide, state: boolean) {
 		if(sinkButtonSide === ESinkButtonSide.LEFT) {
 			this.setState({ isLeftSunk: state });
+
+			isInputDown_leftPaddle = state;
 		} else if(sinkButtonSide === ESinkButtonSide.RIGHT) {
 			this.setState({ isRightSunk: state });
+
+			isInputDown_rightPaddle = state;
 		}
 	}
 

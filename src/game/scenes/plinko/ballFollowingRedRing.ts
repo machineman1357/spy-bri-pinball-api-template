@@ -1,7 +1,7 @@
+import { ballMoveDownRedRingSpeed } from "helpers/vars";
 import { redRing_go } from "./scene_plinko";
 
 const startExtraY = -20;
-const moveDownSpeed = 0.1;
 const moveDownAmount = 20;
 
 export class BallFollowingRedRing {
@@ -18,7 +18,7 @@ export class BallFollowingRedRing {
 	}
 
 	update() {
-		const newY = this.ball_body.gameObject.y + moveDownSpeed;
+		const newY = this.ball_body.gameObject.y + ballMoveDownRedRingSpeed;
 		const startY = redRing_go.y + startExtraY;
 
 		if(this.ball_body.gameObject.y >= startY + moveDownAmount) {

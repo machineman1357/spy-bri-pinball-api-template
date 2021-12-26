@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GHST, PINBALL, PLINKO_BORDER, PLINKO_TUBES, PLINKO_TUBES_AND_GRID_BG, PLINKO_UNIVERSE_BG, RED_RING, SPIN_COIN_2, TUBE_BG_COLOR, TUBE_OUTLINE } from "game/assets";
+import { BALL_HITTING_PLAIN_WALL, GHST, GHST_COIN, K_POINTS_RED_PLINKO, MARIO_PIPE_SOUND, PINBALL, PLINKO_BORDER, PLINKO_LOSE_BALL_SOUND, PLINKO_TUBES, PLINKO_TUBES_AND_GRID_BG, PLINKO_UNIVERSE_BG, RED_RING, SPIN_COIN_2, TUBE_BG_COLOR, TUBE_OUTLINE } from "game/assets";
 import { COLLISION_CATEGORIES } from "game/helpers/collisionCategories";
 import { isCompareEitherOrBodies, pushBodyAwayFrom } from "game/helpers/utils";
 import { ballsUnlockedForPlinko } from "game/main";
-import { config } from "game/unOrganized/config";
-import { increaseScore } from "game/unOrganized/stats";
+import { increaseScore, set_isLeftBlackHoleOpen } from "game/unOrganized/stats";
+import { ball_mass, ethCoinPlinko_pointsReward, ethCoin_plinko_audioVolume, ghstBumper_soundVolume, plinko_lose_ball_soundVolume, scores, timeBefore_endOfSceneToPinballSwitch_ms } from "helpers/vars";
 import { game_ref } from "..";
+import { BGMusicScene } from "../bgMusic/scene_bgMusic";
 import { BallFollowingRedRing } from "./ballFollowingRedRing";
 import { BallGoingInTube } from "./ballGoingInTube";
+import { reset as leftBlackHoleReset } from "../pinball/leftBlackHole";
 
 let plinkoScene: any;
 
@@ -36,12 +38,25 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 };
 
 export class PlinkoScene extends Phaser.Scene {
+	private kPointsRedPlinko_sound: any;
+	private marioPipe_sound: any;
+	private ethCoin_sound: any;
+	private ghst_sound: any;
+    private lose_ball_sound: any;
+
     constructor () {
         super(sceneConfig);
     }
 
 	create() {
 		plinkoScene = this;
+
+		const bgMusicScene = this.scene.get('BGMusic') as BGMusicScene;
+		if(bgMusicScene.plinkoOST.isPaused) {
+			bgMusicScene.resume_plinkoOST();
+		} else {
+			bgMusicScene.play_plinkoOST();
+		}
 
 		this.resetStuff();
 
@@ -51,13 +66,19 @@ export class PlinkoScene extends Phaser.Scene {
 
 		ballsNeededToFinishLevel = ballsUnlockedForPlinko;
 		this.create_balls();
-		this.matter.add.mouseSpring();
+
+        if(process.env.NODE_ENV === "development") {
+            this.matter.add.mouseSpring();
+        }
+
 		this.matter.world.setBounds();
 		this.setUp_events();
 		this.create_tubeColliders();
 		const windowAnyBypass: any = window; // I can't do 'window.' because property doesn't exist on it (type error from typescript) so this circumnavigates it
 		windowAnyBypass.MACHINEMAN1357_paddlesInput_container.disable_paddlesInput();
+        document.getElementById("tilt-button-container")!.style.display = "none";
 		this.create_bottomBallKillerCollider();
+		this.setUpSounds();
     }
 
 	update() {
@@ -78,7 +99,7 @@ export class PlinkoScene extends Phaser.Scene {
 				ballGoingInTube.update();
 			}
 	
-			// update balls going in tubes
+			// rotate coins (to avoid balls being stationary on them)
 			for (let i = 0, len = ghstAndCoins.length; i < len; i++) {
 				const ghstOrCoin = ghstAndCoins[i];
 				
@@ -86,6 +107,16 @@ export class PlinkoScene extends Phaser.Scene {
 			}
 		}
     }
+
+	setUpSounds() {
+		this.kPointsRedPlinko_sound = this.sound.add(K_POINTS_RED_PLINKO);
+		this.marioPipe_sound = this.sound.add(MARIO_PIPE_SOUND);
+		this.ethCoin_sound = this.sound.add(BALL_HITTING_PLAIN_WALL, {
+			volume: ethCoin_plinko_audioVolume
+		});
+		this.ghst_sound = this.sound.add(GHST_COIN);
+        this.lose_ball_sound = this.sound.add(PLINKO_LOSE_BALL_SOUND);
+	}
 
 	resetStuff() {
 		isChangingScene = false;
@@ -107,6 +138,7 @@ export class PlinkoScene extends Phaser.Scene {
 
 	collisionFiltering(event: any, bodyA: any, bodyB: any) {
 		const compareData_PB_GHSTB = isCompareEitherOrBodies(bodyA.label, bodyB.label, "PlayerBall", "ghstBumper", bodyA, bodyB);
+		const compareData_PB_C = isCompareEitherOrBodies(bodyA.label, bodyB.label, "PlayerBall", "coin", bodyA, bodyB);
 		const compareData_PB_RR = isCompareEitherOrBodies(bodyA.label, bodyB.label, "PlayerBall", "redRing", bodyA, bodyB);
 		const compareData_PB_T = isCompareEitherOrBodies(bodyA.label, bodyB.label, "PlayerBall", "tube", bodyA, bodyB);
 
@@ -114,30 +146,38 @@ export class PlinkoScene extends Phaser.Scene {
 
 		if(compareData_PB_GHSTB.isSuccess) {
 			pushBodyAwayFrom(compareData_PB_GHSTB.firstBody, compareData_PB_GHSTB.secondBody, 5);
-			increaseScore(config.score.ghstBumper);
+			increaseScore(scores.ghstBumper);
+			this.ghst_sound.play({
+				volume: ghstBumper_soundVolume
+			});
 		} else if(compareData_PB_RR.isSuccess) {
 			this.moveBallDownRedRing(compareData_PB_RR.firstBody);
-			increaseScore(config.score.redRing);
+			increaseScore(scores.redRing);
 			this.createScoreText(1000, compareData_PB_RR.secondBody.gameObject.x, compareData_PB_RR.secondBody.gameObject.y);
+			this.kPointsRedPlinko_sound.play();
 		} else if(compareData_PB_T.isSuccess) {
 			this.moveBallDownTube(compareData_PB_T.firstBody, compareData_PB_T.secondBody);
+			this.marioPipe_sound.play();
 
 			const tubeName = compareData_PB_T.secondBody.MACHINEMAN1357_tubeName;
 			let scoreAmount = -1;
 
 			if(tubeName === "purple") {
-				scoreAmount = config.score.purpleTube;
+				scoreAmount = scores.purpleTube;
 			} else if(tubeName === "blue") {
-				scoreAmount = config.score.blueTube;
+				scoreAmount = scores.blueTube;
 			} else if(tubeName === "yellow") {
-				scoreAmount = config.score.yellowTube;
+				scoreAmount = scores.yellowTube;
 			} else if(tubeName === "green") {
-				scoreAmount = config.score.greenTube;
+				scoreAmount = scores.greenTube;
 			}
 
 			// shared
 			increaseScore(scoreAmount);
 			this.createScoreText(scoreAmount, compareData_PB_T.secondBody.position.x, compareData_PB_T.secondBody.position.y);
+		} else if(compareData_PB_C.isSuccess) {
+			increaseScore(ethCoinPlinko_pointsReward);
+			this.ethCoin_sound.play();
 		}
 	}
 
@@ -152,6 +192,10 @@ export class PlinkoScene extends Phaser.Scene {
 			plinkoScene.completeBall();
 
 			plinkoScene.createScoreText("☠️", ball_body.gameObject.x, ball_body.gameObject.y, 20);
+
+            plinkoScene.lose_ball_sound.play({
+				volume: plinko_lose_ball_soundVolume
+			});
 		}
 	}
 
@@ -163,11 +207,19 @@ export class PlinkoScene extends Phaser.Scene {
 		if(ballsCompleted === ballsNeededToFinishLevel) {
 			console.log("All balls completed!");
 
-			setTimeout(() => {
-				// isChangingScene = true;
-				plinkoScene.scene.stop();
-				plinkoScene.scene.start('Pinball');
-			}, config.scene_plinko.timeBefore_endOfSceneToPinballSwitch_ms);
+			plinkoScene.time.addEvent({
+				delay: timeBefore_endOfSceneToPinballSwitch_ms,
+				callback: () => {
+					const bgMusicScene = this.scene.get('BGMusic') as BGMusicScene;
+					bgMusicScene.resumeMusic();
+					bgMusicScene.pause_plinkoOST();
+
+                    leftBlackHoleReset();
+					plinkoScene.scene.stop();
+					plinkoScene.scene.start('Pinball');
+				},
+				args: []
+			});
 		}
 	}
 
@@ -281,7 +333,8 @@ export class PlinkoScene extends Phaser.Scene {
 				type: 'circle',
 				radius: 18
 			},
-			label: "PlayerBall"
+			label: "PlayerBall",
+			mass: ball_mass
 		};
 		const ball = this.matter.add.image(xPos, yPos, PINBALL, undefined, ballConfig).setDepth(playerBall_depth);
 		ball.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);

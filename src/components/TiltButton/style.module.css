@@ -1,0 +1,44 @@
+.tiltButtonContainer {
+    display: none;
+}
+
+.tiltButtonImg {
+    width: 238px;
+    position: absolute;
+    left: calc(50% + 294px);
+    bottom: 200px;
+}
+
+.tiltButtonImg:hover {
+    cursor: pointer;
+    filter: brightness(1.25);
+}
+
+.tiltButtonImg:active {
+    cursor: pointer;
+    bottom: 190px;
+}
+
+.tiltButtonTextImg {
+    width: 200px;
+    position: absolute;
+    left: calc(50% + 319px);
+    bottom: 140px;
+}
+
+.TILT_underLine {
+    width: 200px;
+    height: 10px;
+    background: #ef1e26;
+    position: absolute;
+    left: calc(50% + 319px);
+    bottom: 112px;
+}
+
+.backButtonText {
+    width: 85px;
+    position: absolute;
+    left: calc(50% + 207px);
+    top: 95px;
+    filter: drop-shadow(0 0 8px black);
+}

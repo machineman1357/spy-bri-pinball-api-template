@@ -9,6 +9,9 @@ import {
 	Route,
 	BrowserRouter as Router,
 } from 'react-router-dom';
+import { version } from 'helpers/vars';
+
+console.log("Version: " + version);
 
 const nav: Array<{ path: string, component: () => JSX.Element, exact?: boolean }> = [
 	{

@@ -1,0 +1,28 @@
+.debug {
+	position: absolute;
+	color: white;
+	font-size: 15px;
+	user-select: none;
+	overflow: hidden;
+	width: 200px;
+	-webkit-mask-image: -webkit-gradient(linear, left 0%, right center, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
+	text-shadow: 1px 1px black;
+}
+
+.debug:hover {
+	width: fit-content;
+	-webkit-mask-image: none;
+	background: #d60dbf;
+    border: 1px solid #ffffff;
+}
+
+.entry {
+	width: max-content;
+}
+
+.note {
+	background-color: #ff000000;
+	padding: 0px;
+	overflow: unset;
+	margin: 0px;
+}

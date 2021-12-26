@@ -1,0 +1,125 @@
+{
+	"textures": [
+		{
+			"image": "passThroughLights_atlas.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 169,
+				"h": 169
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "rounded_bgAndInnerShadow",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 50,
+						"h": 83
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 50,
+						"h": 83
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 50,
+						"h": 83
+					}
+				},
+				{
+					"filename": "rounded_border_white",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 50,
+						"h": 83
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 50,
+						"h": 83
+					},
+					"frame": {
+						"x": 1,
+						"y": 85,
+						"w": 50,
+						"h": 83
+					}
+				},
+				{
+					"filename": "square_bgAndInnerShadow",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 50,
+						"h": 83
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 50,
+						"h": 83
+					},
+					"frame": {
+						"x": 52,
+						"y": 1,
+						"w": 50,
+						"h": 83
+					}
+				},
+				{
+					"filename": "square_border_black",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 50,
+						"h": 83
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 50,
+						"h": 83
+					},
+					"frame": {
+						"x": 52,
+						"y": 85,
+						"w": 50,
+						"h": 83
+					}
+				},
+				{
+					"filename": "square_border_white",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 50,
+						"h": 83
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 50,
+						"h": 83
+					},
+					"frame": {
+						"x": 103,
+						"y": 1,
+						"w": 50,
+						"h": 83
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:828cafedb3cc366805b2fe6bc828f41f:078bd5c0b237cdef74944d1398a51552:7846f073ce4dc7354ab04530aef51127$"
+	}
+}

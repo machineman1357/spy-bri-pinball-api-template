@@ -1,103 +1,138 @@
 import React, {
-  createContext, useContext, useEffect, useState,
-} from 'react';
-import { SubmitScoreReq, HighScore } from 'types';
+	createContext,
+	useContext,
+	useEffect,
+	useState,
+	useRef,
+} from "react";
+import { HighScore, AavegotchiObject } from "types";
+import { useWeb3 } from "web3/context";
+import fb from "firebase";
+
+const firebaseConfig = {
+	apiKey: process.env.REACT_APP_FIREBASE_APIKEY,
+	authDomain: process.env.REACT_APP_FIREBASE_AUTHDOMAIN,
+	databaseURL: process.env.REACT_APP_FIREBASE_DATABASEURL,
+	projectId: process.env.REACT_APP_FIREBASE_PROJECTID,
+	storageBucket: process.env.REACT_APP_FIREBASE_STORAGEBUCKET,
+	messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGINGSENDERID,
+	appId: process.env.REACT_APP_FIREBASE_APPID,
+	measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENTID,
+};
 
 interface IServerContext {
-  highscores?: Array<HighScore>;
-  handleSubmitScore?: (
-    score: number,
-    gotchiData: SubmitScoreReq
-  ) => void;
+	highscores?: Array<HighScore>;
 }
 
 export const ServerContext = createContext<IServerContext>({});
 
 export const ServerProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  const [highscores, setHighscores] = useState<Array<HighScore>>();
+		children,
+	}: {
+		children: React.ReactNode;
+	}) => {
+	const {
+		state: { usersAavegotchis },
+	} = useWeb3();
+	const [highscores, setHighscores] = useState<Array<HighScore>>();
+	const [firebase, setFirebase] = useState<fb.app.App>();
+	const [initiated, setInitiated] = useState(false);
 
-  const sortByScore = (a: HighScore, b: HighScore) => b.score - a.score;
+	const sortByScore = (a: HighScore, b: HighScore) => b.score - a.score;
 
-  // Used in development only - Highscore submissions in production should submit server side
-  const handleSubmitScore = (
-    score: number,
-    gotchiData: SubmitScoreReq,
-  ) => {
-    const { name, tokenId } = gotchiData;
+	const myHighscoresRef = useRef(highscores);
 
-    const newHighscores = highscores ? [...highscores] : [];
-    const gotchiPrevScore = newHighscores.find(
-      (score) => score.tokenId === gotchiData.tokenId,
-    );
-    console.log(newHighscores);
-    if (gotchiPrevScore) {
-      if (gotchiPrevScore.score < score) {
-        gotchiPrevScore.score = score;
-      }
-    } else {
-      newHighscores.push({
-        tokenId,
-        score,
-        name,
-      });
-    }
-    window.localStorage.setItem('highscores', JSON.stringify(newHighscores));
-    const success = true;
+	const setMyHighscores = (data: Array<HighScore>) => {
+		myHighscoresRef.current = data;
+		setHighscores(data);
+	};
 
-    if (success) {
-      const highscoresCopy = highscores === undefined ? [] : [...highscores];
+	const converter = {
+		toFirestore: (data: HighScore) => data,
+		fromFirestore: (snap: fb.firestore.QueryDocumentSnapshot) =>
+			snap.data() as HighScore,
+	};
 
-      const indexOfScore = highscoresCopy.findIndex(
-        (score) => score.tokenId === tokenId,
-      );
-      if (indexOfScore >= 0) {
-        highscoresCopy[indexOfScore].score = score;
-      } else {
-        highscoresCopy.push({
-          tokenId,
-          score,
-          name,
-        });
-      }
+	const snapshotListener = (
+		database: fb.firestore.Firestore,
+		gotchis: Array<AavegotchiObject>
+	) => {
+    console.log("process.env.REACT_APP_COLLECTION_NAME:", process.env.REACT_APP_COLLECTION_NAME);
+		return database
+			.collection(process.env.REACT_APP_COLLECTION_NAME || "test")
+			.withConverter(converter)
+			.where(
+				"tokenId",
+				"in",
+				gotchis.map((gotchi) => gotchi.id)
+			)
+			.onSnapshot((snapshot) => {
+				snapshot.docChanges().forEach((change) => {
+					const changedItem = change.doc.data();
+					const newHighscores = myHighscoresRef.current
+						? [...myHighscoresRef.current]
+						: [];
+					const itemIndex = newHighscores.findIndex(
+						(item) => item.tokenId === changedItem.tokenId
+					);
+					if (itemIndex >= 0) {
+						newHighscores[itemIndex] = changedItem;
+						setMyHighscores(newHighscores.sort(sortByScore));
+					} else {
+						setMyHighscores([...newHighscores, changedItem].sort(sortByScore));
+					}
+				});
+			});
+	};
 
-      highscoresCopy.sort(sortByScore);
-      setHighscores(highscoresCopy);
-    }
-  };
+	useEffect(() => {
+		if (usersAavegotchis && usersAavegotchis.length > 0 && firebase && initiated) {
+			const db = firebase.firestore();
+			const gotchiSetArray = [];
+			for (let i = 0; i < usersAavegotchis.length; i += 10) {
+				gotchiSetArray.push(usersAavegotchis.slice(i, i + 10));
+			}
+			const listenerArray = gotchiSetArray.map((gotchiArray) =>
+				snapshotListener(db, gotchiArray)
+			);
 
-  const handleGetHighscores = async () => {
-    // Replace dummy logic with API request to fetch highscores
-    const res = await new Promise<HighScore[]>((res) => {
-      setTimeout(() => {
-        res(JSON.parse(window.localStorage.getItem('highscores') || '[]'));
-      }, 300);
-    });
-    return res;
-  };
+			return () => {
+				listenerArray.forEach((listener) => listener());
+			};
+		}
+	}, [usersAavegotchis, firebase]);
 
-  useEffect(() => {
-    const getHighscores = async () => {
-      const res = await handleGetHighscores();
-      setHighscores(res);
-    };
+	useEffect(() => {
+		const getHighscores = async (_firebase: fb.app.App) => {
+			const db = _firebase.firestore();
+			const highscoreRef = db
+				.collection(process.env.REACT_APP_COLLECTION_NAME || "test")
+				.withConverter(converter);
+			const snapshot = await highscoreRef.get();
 
-    getHighscores();
-  }, []);
+			const highscoreResults: Array<HighScore> = [];
+			snapshot.forEach((doc: any) => highscoreResults.push(doc.data()));
 
-  return (
-    <ServerContext.Provider
-      value={{
-        highscores,
-        handleSubmitScore,
-      }}
-    >
-      {children}
-    </ServerContext.Provider>
-  );
+			setMyHighscores(highscoreResults.sort(sortByScore));
+			setInitiated(true);
+		};
+
+		if (!firebase) {
+			const firebaseInit = fb.initializeApp(firebaseConfig);
+			setFirebase(firebaseInit);
+			getHighscores(firebaseInit);
+		}
+	}, [firebase]);
+
+	return (
+		<ServerContext.Provider
+			value={{
+				highscores,
+			}}
+		>
+			{children}
+		</ServerContext.Provider>
+	);
 };
 
 export const useServer = () => useContext(ServerContext);

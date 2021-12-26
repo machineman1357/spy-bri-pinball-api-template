@@ -169,7 +169,6 @@ class SingleArrow {
 		increase_ballsUnlockedForPlinko();
 
 		this.isTaken = true;
-		console.log(this.arrowSprite,ARROW_PURPLE );
 		this.arrowSprite.setTexture(ARROW_PURPLE);
 		this.singleArrow_addTimerSpriteToArrow();
 	}

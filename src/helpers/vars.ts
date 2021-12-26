@@ -44,3 +44,71 @@ export enum WearableSlots {
   Pet = 6,
   BG = 7,
 }
+
+export const is_debug = false;
+export const version = `25:
+- fixed left black hole multiplier bug
+`;
+export const isLog_loadFiles = false;
+export const is_musicEnabled = true;
+if(!is_musicEnabled) console.warn("Music is disabled");
+
+export const ballSpeedForWallHitSound = 1;
+export const ballSpeedForWallHitSound_max = 10;
+export const ballWallHitSoundOnHoldFor_ms = 400;
+
+export const timeBeforeStartPlinkoSceneAfterBallEnteredPortal_ms = 1000;
+
+export const ball_mass = 0.1;
+
+export const ballMoveDownRedRingSpeed = 0.3;
+
+export const ethCoinPlinko_pointsReward = 10;
+
+export const gravityY = 0.45;
+
+export const slingShotSensorLeft_position = { x: 154, y: 756 };
+export const slingShotSensorRight_position = { x: 400, y: 750 };
+export const slingshotBumperForce = 10;
+
+export const wallBumperSensorLeft_position = { x: 90, y: 630 };
+export const wallBumperSensorRight_position = { x: 470, y: 630 };
+
+export const ethCoin_plinko_audioVolume = 0.5;
+
+export const gameUI_retryFontSize = 29;
+
+export const is_logMousePos = false;
+
+export const pinballScene_ethCoinMaxSoundCount = 5;
+export const pinballScene_maxBallSpeedForEthCoinMaxSoundCount = 14;
+export const pinballScene_timeBetweenEthCoinSounds_ms = 150;
+
+export const ghstBumper_soundVolume = 0.36;
+export const plinko_lose_ball_soundVolume = 1;
+
+export const timeBefore_endOfSceneToPinballSwitch_ms = 1000;
+
+export const scores = {
+	pointsReceive_spinningCoin: 500,
+	ghstBumper: 100,
+	wallBumperSensor: 100,
+	redRing: 1000,
+	purpleTube: 10,
+	blueTube: 50,
+	yellowTube: 100,
+	greenTube: 5,
+	ballReturnsToStart: 500
+};
+
+export const topLeftHole = {
+	staysOpenFor_ms: 30000, // default = 30000
+	doublePointsLastFor_ms: 30000, // default = 30000
+	timeInHole_ms: 1000,
+	timeBeforeBallCanEnterHoleAgain_ms: 1000,
+	exitHoleVelocityY: 10
+};
+
+export const is_allowDefaultAavegotchi = true;
+export const tiltBehaviorButtonKey = "T";
+export const tiltBehaviour_delay_ms = 4000;

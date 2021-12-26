@@ -3,9 +3,10 @@ import { getGameHeight, getGameWidth } from "game/helpers";
 import { assets, SpritesheetAsset } from "game/assets";
 import { constructSpritesheet } from "../helpers/spritesheet";
 import { customiseSvg } from "helpers/aavegotchi";
-// import { Socket } from "socket.io-client";
-import { isLog_loadFiles } from "helpers/isDebugs";
+import { Socket } from "socket.io-client";
+import { isLog_loadFiles } from "helpers/vars";
 import Phaser from 'phaser';
+import { pinballScene } from "./pinball/pinball-scene";
 
 interface AavegotchiWithSvg extends AavegotchiObject {
 	svg: Tuple<string, 4>;
@@ -16,14 +17,13 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 	visible: false,
 	key: "Boot",
 };
-console.log("BootScene scene", Phaser);
 
 /**
  * The initial scene that loads all necessary assets to the game.
  */
 export class BootScene extends Phaser.Scene {
-	// private socket?: Socket;
-	// private connected?: boolean;
+	private socket?: Socket;
+	private connected?: boolean;
 	private assetsLoaded?: boolean;
 	private gotchi?: AavegotchiGameObject;
 	private loadIndex: number;
@@ -34,6 +34,18 @@ export class BootScene extends Phaser.Scene {
 	constructor() {
 		super(sceneConfig);
 		this.loadIndex = 0;
+
+        window.onmessage = (event) => { 
+            if(event.data.msgType === "TILT_BUTTON") {
+                console.log("received tilt button window message");
+                if(!pinballScene) return;
+                console.log(pinballScene, pinballScene.scene);
+                if(!pinballScene.scene) return;
+                if(!pinballScene.scene.isActive()) return;
+                
+                pinballScene.tiltBehavior.tilt();
+            }
+        };
 	}
 
 	public preload = (): void => {
@@ -49,19 +61,19 @@ export class BootScene extends Phaser.Scene {
 		};
 
 		// Checks connection to the server
-		// this.socket = this.game.registry.values.socket;
-		// !this.socket?.connected
-		// 	? this.socket?.on("connect", () => {
-		// 		this.handleConnection();
-		// 	})
-		// 	: this.handleConnection();
+		this.socket = this.game.registry.values.socket;
+		!this.socket?.connected
+			? this.socket?.on("connect", () => {
+				this.handleConnection();
+			})
+			: this.handleConnection();
 
 		// Listener that triggers when an asset has loaded
 		this.load.on(
 			"filecomplete",
 			(key: string) => {
-				if(isLog_loadFiles)console.log(`filecomplete [key: ${key}] [assets.length: ${assets.length}] [loadIndex: ${this.loadIndex}]`);
-				
+				if (isLog_loadFiles) console.log(`filecomplete [key: ${key}] [assets.length: ${assets.length}] [loadIndex: ${this.loadIndex}]`);
+
 				// As the spritesheet is the last asset to load in, we can attempt to start the game
 				if (key === "PLAYER") {
 					this.assetsLoaded = true;
@@ -82,17 +94,17 @@ export class BootScene extends Phaser.Scene {
 	/**
 	 * Submits gotchi data to the server and attempts to start game
 	 */
-	// private handleConnection = () => {
-	// 	console.log("handleConnection()");
-	// 	const gotchi = this.game.registry.values.selectedGotchi as AavegotchiObject;
-	// 	this.connected = true;
-	// 	this.socket?.emit("setGotchiData", {
-	// 		name: gotchi.name,
-	// 		tokenId: gotchi.id,
-	// 	});
+	private handleConnection = () => {
+		console.log("handleConnection()");
+		const gotchi = this.game.registry.values.selectedGotchi as AavegotchiObject;
+		this.connected = true;
+		this.socket?.emit("setGotchiData", {
+			name: gotchi.name,
+			tokenId: gotchi.id,
+		});
 
-	// 	this.startGame();
-	// };
+		this.startGame();
+	};
 
 	/**
 	 * If all the assets are loaded in, and user is connected to server, start game
@@ -143,7 +155,44 @@ export class BootScene extends Phaser.Scene {
 		const file = assets[index];
 		this.loadIndex++;
 
-		if(isLog_loadFiles) console.log(`loadNextFile [file.key: ${file.key}] [assets.length: ${assets.length}] [loadIndex: ${this.loadIndex}]`);
+		if (isLog_loadFiles) {
+			let colorStyle;
+
+			switch (file.type) {
+				case "IMAGE":
+					colorStyle = "color: #00ff00";
+					break;
+				case "SVG":
+					colorStyle = "color: #00ffff";
+					break;
+				case "AUDIO":
+					colorStyle = "color: #3399ff";
+					break;
+				case "SPRITESHEET":
+					colorStyle = "color: #ff99ff";
+					break;
+				case "TILEMAP_TILES":
+					colorStyle = "color: #ffcc99";
+					break;
+				case "TILEMAP_MAP":
+					colorStyle = "color: #ffff66";
+					break;
+				case "JSON":
+					colorStyle = "color: #ff9900";
+					break;
+				case "ATLAS":
+					colorStyle = "color: #ff3399";
+					break;
+				default:
+					colorStyle = "color: white";
+					break;
+			}
+
+			if (isLog_loadFiles) console.log(
+				`%cloadNextFile [file.key: ${file.key}] [assets.length: ${assets.length}] [file source: ${file.src}] [loadIndex: ${this.loadIndex}] [file type: ${file.type}]`,
+				colorStyle
+			);
+		}
 
 		if (this.loadingText && this.progressBar && this.progressBarContainer) {
 			this.loadingText.setText(`Loading: ${file.key}`);

@@ -79,3 +79,11 @@ export function pushBodyAwayFrom(bodyA: any, bodyB: any, force: any) {
 
 	bodyA.gameObject.setVelocity(normDir.x * force, normDir.y * force);
 }
+
+export function pushBodyAwayPoint(bodyA: any, point: { x: number, y: number }, force: any) {
+	const posA = bodyA.position;
+
+	const normDir = getNormalizedDirectionAndAngle(point.x, point.y, posA.x, posA.y);
+
+	bodyA.gameObject.setVelocity(normDir.x * force, normDir.y * force);
+}

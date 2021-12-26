@@ -17,7 +17,9 @@ export function setNewStatsBarContainerSize() {
 		const twoTimesPadding = statsBar_padding * 2;
 		const extraWidth = 2;
 	
-		ref_statsBar.style.width = canvasRect.width - twoTimesPadding + extraWidth + "px";
+		if(ref_statsBar) {
+			ref_statsBar.style.width = canvasRect.width /*- twoTimesPadding*/ + extraWidth + "px";
+		}
 	}
 }
 

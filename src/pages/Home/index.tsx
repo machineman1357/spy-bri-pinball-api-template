@@ -15,6 +15,7 @@ import gotchiLoading from "assets/gifs/loading.gif";
 import { playSound } from "helpers/hooks/useSound";
 import styles from "./styles.module.css";
 import { RotateIcon } from "assets";
+import { is_allowDefaultAavegotchi } from "helpers/vars";
 
 
 const Home = () => {
@@ -143,6 +144,28 @@ const Home = () => {
 		);
 	}
 
+	let defaultAavegotchiStuff;
+	if (is_allowDefaultAavegotchi) {
+		defaultAavegotchiStuff =
+			<button
+				onClick={usePreviewGotchis}
+				className={globalStyles.primaryButton}
+			>
+				Use Preview Gotchis
+			</button>
+	} else {
+		process.env.NODE_ENV === "development" && (
+			defaultAavegotchiStuff =
+			<button
+				onClick={usePreviewGotchis}
+				className={globalStyles.primaryButton}
+			>
+				Use Preview Gotchis
+			</button>
+		)
+	}
+	console.log("process.env.NODE_ENV:", process.env.NODE_ENV);
+
 	if (usersAavegotchis && usersAavegotchis?.length <= 0) {
 		return (
 			<Layout>
@@ -163,14 +186,7 @@ const Home = () => {
 							Visit Bazaar
 						</a>
 						{/* Allows developers to build without the requirement of owning a gotchi */}
-						{process.env.NODE_ENV === "development" && (
-							<button
-								onClick={usePreviewGotchis}
-								className={globalStyles.primaryButton}
-							>
-								Use Preview Gotchis
-							</button>
-						)}
+						{defaultAavegotchiStuff}
 					</div>
 				</div>
 			</Layout>
@@ -224,9 +240,9 @@ const Home = () => {
 									}`}
 								onClick={() => playSound("send")}
 							>
-								Start
+								Click To Start
 							</Link>
-							<button
+							{/* <button
 								onClick={() => {
 									playSound("click");
 									setShowRulesModal(true);
@@ -234,16 +250,16 @@ const Home = () => {
 								className={`${globalStyles.secondaryButton} ${globalStyles.circleButton}`}
 							>
 								?
-							</button>
+							</button> */}
 						</div>
 					</div>
-					<div className={styles.detailsPanelContainer}>
+					{/* <div className={styles.detailsPanelContainer}>
 						<DetailsPanel
 							selectedGotchi={usersAavegotchis?.find(
 								(gotchi) => gotchi.id === selectedAavegotchiId
 							)}
 						/>
-					</div>
+					</div> */}
 				</div>
 			</div>
 		</Layout>

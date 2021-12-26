@@ -4,7 +4,7 @@ let current_multiplier = 0;
 let finalMultiplier = 0;
 let isLeftBlackHoleOpen = false;
 
-let currentScore = 0;
+export let currentScore = 0;
 
 function updateFinalMultiplier() {
 	finalMultiplier = current_multiplier;
@@ -28,7 +28,18 @@ export function increaseScore(points: any) {
 }
 
 export function modifyMultiplier(amount: any) {
+    const multiplierBEFORE = current_multiplier;
 	current_multiplier += amount;
 
+    console.log(`Modifying multiplier. [before: ${multiplierBEFORE}] [amount: ${amount}] [after: ${current_multiplier}]`);
+
+	updateFinalMultiplier();
+}
+
+export function resetScore() {
+	currentScore = 0;
+	current_multiplier = 0;
+
+	set_scoreText(currentScore);
 	updateFinalMultiplier();
 }
